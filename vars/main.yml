@@ -1,0 +1,5 @@
+---
+
+limits:
+  - elasticsearch soft memlock unlimited
+  - elasticsearch hard memlock unlimited

@@ -1,0 +1,9 @@
+---
+
+- name: setup data storage
+  file:
+    path: "{{ configuration['path']['data'] }}"
+    owner: elasticsearch
+    state: directory
+  notify: restart elasticsearch
+  tags: configure

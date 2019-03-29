@@ -1,62 +1,49 @@
-- name: install elasticsearch
+---
+
+- name: platform dependent vars
+  # include_tasks: "{{ lookup('first_found', params, errors='ignore') }}"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - '{{ role_path }}/vars/'
+      skip: true
+  tags: [install, configure]
+
+- name: platform dependent tasks
+  # include_tasks: "{{ lookup('first_found', params, errors='ignore') }}"
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - '{{ role_path }}/tasks/platform/'
+      skip: true
+  tags: install
+
+- name: establish package
   package:
     name: elasticsearch
     state: present
+  notify: setup tools
   tags: install
 
-- name: configure elastic
+- include_tasks: setup_data_storage.yml
+
+- name: establish configuration
   template:
     src: "{{ item }}"
-    dest: "/etc/elasticsearch/{{ item }}"
-  with_items:
-  - elasticsearch.yml
-  - jvm.options
+    dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/{{ item | basename | regex_replace('\\.j2','') }}"
   notify: restart elasticsearch
+  loop: 
+    - elasticsearch.yml.j2
+    - jvm.options.j2
   tags: configure
-
-- name: remove limitations on memory
-  template:
-    src: "limits.conf"
-    dest: "/etc/security/limits.d/elasticsearch.conf"
-  notify: restart elasticsearch
-  tags: configure
-
-- name: load limits on session login
-  lineinfile:
-    path: "/etc/pam.d/common-session"
-    line: "session required pam_limits.so"
-  notify: restart elasticsearch
-  tags: configure
-
-- name: create data storage
-  file:
-    path: "{{ elastic.data_path }}"
-    owner: elasticsearch
-    state: directory
-  notify: restart elasticsearch
-  tags: configure
-
-- name: prepare systemd override directory
-  file:
-    path: "/etc/systemd/system/elasticsearch.service.d"
-    state: directory
-  tags: configure
-
-- name: configure memlock
-  copy:
-    src: "override.conf"
-    dest: "/etc/systemd/system/elasticsearch.service.d/override.conf"
-  notify:
-  - reload systemctl
-  - restart elasticsearch
-  tags: configure
-
-#- name: change mem limits MAX_LOCKED_MEMORY=unlimited and LimitMEMLOCK=infinity
-
-- name: enable services
-  service:
-    name: elasticsearch
-    enabled: yes
-    state: started
-  tags: configure, install
 

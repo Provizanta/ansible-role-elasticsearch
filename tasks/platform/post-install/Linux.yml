@@ -1,0 +1,39 @@
+---
+
+- name: setup limits
+  lineinfile:
+    line: "{{ item }}"
+    path: "/etc/security/limits.d/elasticsearch.conf"
+    create: yes
+  loop: "{{ limits }}"
+  notify: restart elasticsearch
+  tags: install
+  
+- name: load limits on session login
+  lineinfile:
+    path: "/etc/pam.d/common-session"
+    line: "session required pam_limits.so"
+  notify: restart elasticsearch
+  tags: install
+
+- name: establish systemd override directory
+  file:
+    path: "/etc/systemd/system/elasticsearch.service.d"
+    state: directory
+  tags: install
+
+- name: setup memlock
+  copy:
+    src: "override.conf"
+    dest: "/etc/systemd/system/elasticsearch.service.d/override.conf"
+  notify:
+    - reload systemctl
+    - restart elasticsearch
+  tags: configure
+
+- name: enable services
+  systemd:
+    name: elasticsearch
+    enabled: yes
+    state: started
+  tags: [install,configure]

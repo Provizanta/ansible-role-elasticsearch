@@ -5,5 +5,17 @@
 - name: restart elasticsearch
   service:
     name: elasticsearch
-    state: restarted
+    state: "{{ 'restarted' if service['state'] == 'started' else service['state'] }}"
+
+- name: setup tools
+  # include_tasks: "{{ lookup('first_found', params) }}"
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - '{{ role_path }}/tasks/platform/post-install/'
 

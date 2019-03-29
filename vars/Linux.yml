@@ -1,0 +1,6 @@
+---
+
+platform:
+  elasticsearch:
+    configuration:
+      dir: "/etc/elasticsearch/"
