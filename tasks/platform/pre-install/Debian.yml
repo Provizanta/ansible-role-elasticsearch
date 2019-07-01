@@ -1,10 +1,29 @@
 ---
 
+- name: establish man directory
+  when: ansible_connection == 'docker'
+  file:
+    path: /usr/share/man/man1
+    state: directory
+
+- name: enable universe repository
+  when: ansible_distribution == "Ubuntu"
+  apt_repository:
+    repo: "{{ item }}"
+  loop:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates universe"
+    - "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
+  register: universe_repo
+
+- name: update cache
+  when: universe_repo.changed
+  apt:
+    update_cache: true
+
 - name: establish dependencies
-  package:
-    name:
-      - apt-transport-https
-      - openjdk-*-jre-headless
+  apt:
+    name: "{{ java_packages }}"
     state: present
   tags: install
 

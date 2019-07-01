@@ -1,10 +1,10 @@
 ---
 
+java_packages:
+  - apt-transport-https
+  - openjdk-11-jre-headless
+
 platform:
   elasticsearch:
     configuration:
       dir: "/etc/elasticsearch/"
-
-java_packages:
-  - apt-transport-https
-  - default-jdk

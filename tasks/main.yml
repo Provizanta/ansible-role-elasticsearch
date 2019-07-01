@@ -1,31 +1,31 @@
 ---
 
 - name: platform dependent vars
-  include_tasks: "{{ query('first_found', params, errors='ignore') }}"
-  vars:
-    params:
-      - files:
-          - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
-          - "{{ ansible_distribution }}.yml"
-          - "{{ ansible_os_family }}.yml"
-          - "{{ ansible_system }}.yml"
-        paths:
-          - '{{ role_path }}/vars/'
-        skip: true
+  include_vars: "{{ item }}"
+  # loop: "{{ query('first_found', params, errors='ignore') }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - '{{ role_path }}/vars/platform/'
+      skip: true
   tags: [install, configure]
 
 - name: platform dependent tasks
-  include_tasks: "{{ query('first_found', params, errors='ignore') }}"
-  vars:
-    params:
-      - files:
-          - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
-          - "{{ ansible_distribution }}.yml"
-          - "{{ ansible_os_family }}.yml"
-          - "{{ ansible_system }}.yml"
-        paths:
-          - '{{ role_path }}/tasks/platform/pre-install/'
-        skip: true
+  include_tasks: "{{ item }}"
+  # loop: "{{ query('first_found', params, errors='ignore') }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
+      paths:
+        - '{{ role_path }}/tasks/platform/pre-install/'
+      skip: true
   tags: install
 
 - name: establish package

@@ -18,7 +18,8 @@ galaxy_info:
         - cosmic
     - name: Debian
       versions:
-        - all
+        - stretch
+        - buster
 
   galaxy_tags:
     - elasticsearch

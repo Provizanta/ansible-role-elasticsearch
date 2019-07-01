@@ -10,10 +10,8 @@ env:
     - ROLE_NAME: elasticsearch
   matrix:
     - MOLECULE_DISTRO: ubuntu1804
-    - MOLECULE_DISTRO: debian8
     - MOLECULE_DISTRO: debian9
     - MOLECULE_DISTRO: debian10
-    - MOLECULE_DISTRO: amazonlinux2
 
 install:
   - pip install molecule docker
