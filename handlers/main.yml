@@ -1,21 +1,22 @@
+---
+
 - name: reload systemctl
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 - name: restart elasticsearch
   service:
     name: elasticsearch
-    state: "{{ 'restarted' if service['state'] == 'started' else service['state'] }}"
+    state: "{{ service['state'] == 'started' | ternary('restarted',service['state']) }}"
 
 - name: setup tools
-  # include_tasks: "{{ lookup('first_found', params) }}"
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
-        - "{{ ansible_distribution }}.yml"
-        - "{{ ansible_os_family }}.yml"
-        - "{{ ansible_system }}.yml"
-      paths:
-        - '{{ role_path }}/tasks/platform/post-install/'
-
+  include_tasks: "{{ query('first_found', params, errors='ignore') }}"
+  vars:
+    params:
+      - files:
+          - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
+          - "{{ ansible_distribution }}.yml"
+          - "{{ ansible_os_family }}.yml"
+          - "{{ ansible_system }}.yml"
+        paths:
+          - '{{ role_path }}/tasks/platform/post-install/'

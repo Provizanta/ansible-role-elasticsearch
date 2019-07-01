@@ -4,11 +4,11 @@
   lineinfile:
     line: "{{ item }}"
     path: "/etc/security/limits.d/elasticsearch.conf"
-    create: yes
+    create: true
   loop: "{{ limits }}"
   notify: restart elasticsearch
   tags: install
-  
+
 - name: load limits on session login
   lineinfile:
     path: "/etc/pam.d/common-session"
@@ -34,6 +34,8 @@
 - name: enable services
   systemd:
     name: elasticsearch
-    enabled: yes
+    enabled: true
     state: started
-  tags: [install,configure]
+  tags:
+    - install
+    - configure

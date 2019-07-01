@@ -19,12 +19,12 @@
   lineinfile:
     line: "deb https://artifacts.elastic.co/packages/{{ version | int }}.x/apt stable main"
     path: /etc/apt/sources.list.d/elastic.list
-    create: yes
+    create: true
   register: apt_update
   tags: install
 
 - name: udpate repositories
-  apt:
-    update_cache: yes
-  tags: install
   when: apt_update.changed
+  apt:
+    update_cache: true
+  tags: install
