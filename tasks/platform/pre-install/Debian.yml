@@ -16,6 +16,15 @@
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates universe"
     - "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
 
+- name: update repos (docker)
+  when:
+    - ansible_connection == 'docker'
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_release == 'xenial'
+  apt:
+    update_cache: true
+  tags: install
+
 - name: establish dependencies
   apt:
     name: "{{ java_packages }}"
@@ -30,15 +39,8 @@
   tags: install
 
 - name: establish elasticsearch repo
-  lineinfile:
-    line: "deb https://artifacts.elastic.co/packages/{{ version | int }}.x/apt stable main"
-    path: /etc/apt/sources.list.d/elastic.list
-    create: true
-  register: apt_update
-  tags: install
-
-- name: udpate repositories
-  when: apt_update.changed
-  apt:
-    update_cache: true
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/{{ version | int }}.x/apt stable main"
+    state: present
+    filename: elastic
   tags: install

@@ -1,0 +1,10 @@
+---
+
+java_packages:
+  - apt-transport-https
+  - openjdk-8-jre-headless
+
+platform:
+  elasticsearch:
+    configuration:
+      dir: "/etc/elasticsearch/"
