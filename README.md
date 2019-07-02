@@ -40,6 +40,10 @@ These defaults are set in defaults/main.yml:
       enabled: true
       state: started
 
+Non defaulted variables that can be set:
+
+    log4j2: <string, entire file contents>
+
 Dependencies
 ------------
 

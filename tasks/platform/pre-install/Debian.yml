@@ -10,16 +10,11 @@
   when: ansible_distribution == "Ubuntu"
   apt_repository:
     repo: "{{ item }}"
+    update_cache: true
   loop:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} universe"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates universe"
     - "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
-  register: universe_repo
-
-- name: update cache
-  when: universe_repo.changed
-  apt:
-    update_cache: true
 
 - name: establish dependencies
   apt:
