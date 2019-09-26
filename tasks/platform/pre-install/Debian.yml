@@ -31,6 +31,12 @@
     state: present
   tags: install
 
+- name: establish dependencies
+  package:
+    name: gnupg-agent
+    state: present
+  tags: install
+
 - name: establish elasticsearch repo key
   apt_key:
     url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
