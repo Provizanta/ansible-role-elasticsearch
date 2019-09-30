@@ -12,7 +12,7 @@
       paths:
         - '{{ role_path }}/vars/platform/'
       skip: true
-  tags: [install, configure]
+  tags: install, configure
 
 - name: platform dependent tasks
   include_tasks: "{{ item }}"
@@ -39,6 +39,7 @@
   file:
     path: "{{ configuration['path']['data'] }}"
     owner: elasticsearch
+    group: elasticsearch
     state: directory
   notify: restart elasticsearch
   tags: configure
@@ -47,6 +48,8 @@
   template:
     src: "{{ item.value }}"
     dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/{{ item.value | basename | regex_replace('\\.j2','') }}"
+    owner: elasticsearch
+    group: elasticsearch
   notify: restart elasticsearch
   loop: "{{ properties | dict2items }}"
   vars:
@@ -60,6 +63,8 @@
   template:
     src: "{{ item }}"
     dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/{{ item | basename | regex_replace('\\.j2','') }}"
+    owner: elasticsearch
+    group: elasticsearch
   notify: restart elasticsearch
   loop:
     - log4j2.properties.j2
