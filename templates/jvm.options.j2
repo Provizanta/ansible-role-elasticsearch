@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 
--Xms{{ jvm_options['heap_space'] }}
--Xmx{{ jvm_options['heap_space'] }}
+-Xms{{ elk_elasticsearch_jvm_options['heap_space'] }}
+-Xmx{{ elk_elasticsearch_jvm_options['heap_space'] }}
 
 ## GC configuration
 -XX:+UseConcMarkSweepGC
@@ -49,23 +49,23 @@
 
 # specify an alternative path for heap dumps; ensure the directory exists and
 # has sufficient space
--XX:HeapDumpPath={{ configuration['path']['data'] }}
+-XX:HeapDumpPath={{ elk_elasticsearch_configuration['path']['data'] | default('/var/log/elasticsearch/') }}
 
 # specify an alternative path for JVM fatal error logs
--XX:ErrorFile={{ configuration['path']['logs'] }}/hs_err_pid%p.log
+-XX:ErrorFile={{ elk_elasticsearch_configuration['path']['logs'] | default('/var/log/elasticsearch/') }}/hs_err_pid%p.log
 
 ## JDK 8 GC logging
 8:-XX:+PrintGCDetails
 8:-XX:+PrintGCDateStamps
 8:-XX:+PrintTenuringDistribution
 8:-XX:+PrintGCApplicationStoppedTime
-8:-Xloggc:{{ configuration['path']['logs'] }}/gc.log
+8:-Xloggc:{{ elk_elasticsearch_configuration['path']['logs'] | default('/var/log/elasticsearch/') }}/gc.log
 8:-XX:+UseGCLogFileRotation
 8:-XX:NumberOfGCLogFiles=32
 8:-XX:GCLogFileSize=64m
 
 # JDK 9+ GC logging
-9-:-Xlog:gc*,gc+age=trace,safepoint:file={{ configuration['path']['logs'] }}/gc.log:utctime,pid,tags:filecount=32,filesize=64m
+9-:-Xlog:gc*,gc+age=trace,safepoint:file={{ elk_elasticsearch_configuration['path']['logs'] | default('/var/log/elasticsearch/') }}/gc.log:utctime,pid,tags:filecount=32,filesize=64m
 # due to internationalization enhancements in JDK 9 Elasticsearch need to set the provider to COMPAT otherwise
 # time/date parsing will break in an incompatible way for some date patterns and locals
 9-:-Djava.locale.providers=COMPAT

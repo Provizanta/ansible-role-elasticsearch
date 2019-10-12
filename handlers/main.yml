@@ -7,13 +7,14 @@
 - name: restart elasticsearch
   service:
     name: elasticsearch
-    state: "{{ (service['state'] == 'started') | ternary('restarted', service['state']) }}"
+    state: "{{ (elk_elasticsearch_service['state'] == 'started') | ternary('restarted', elk_elasticsearch_service['state']) }}"
 
 - name: setup tools
   include_tasks: "{{ item }}"
-  # loop: "{{ query('first_found', params, errors='ignore') }}"
-  with_first_found:
-    - files:
+  loop: "{{ query('first_found', params, errors='ignore') }}"
+  vars:
+    params:
+      files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"

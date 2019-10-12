@@ -2,30 +2,30 @@
 
 - name: platform dependent vars
   include_vars: "{{ item }}"
-  # loop: "{{ query('first_found', params, errors='ignore') }}"
-  with_first_found:
-    - files:
+  loop: "{{ query('first_found', params, errors='ignore') }}"
+  vars:
+    params:
+      files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
         - "{{ ansible_system }}.yml"
       paths:
         - '{{ role_path }}/vars/platform/'
-      skip: true
-  tags: install, configure
+  tags: always
 
 - name: platform dependent tasks
   include_tasks: "{{ item }}"
-  # loop: "{{ query('first_found', params, errors='ignore') }}"
-  with_first_found:
-    - files:
+  loop: "{{ query('first_found', params, errors='ignore') }}"
+  vars:
+    params:
+      files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
         - "{{ ansible_system }}.yml"
       paths:
         - '{{ role_path }}/tasks/platform/pre-install/'
-      skip: true
   tags: install
 
 - name: establish package
@@ -36,36 +36,40 @@
   tags: install
 
 - name: setup data storage
+  when: elk_elasticsearch_configuration is defined
   file:
-    path: "{{ configuration['path']['data'] }}"
+    path: "{{ elk_elasticsearch_configuration['path']['data'] }}"
     owner: elasticsearch
     group: elasticsearch
     state: directory
-  notify: restart elasticsearch
   tags: configure
 
 - name: establish configuration
+  when: elk_elasticsearch_configuration is defined
   template:
-    src: "{{ item.value }}"
-    dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/{{ item.value | basename | regex_replace('\\.j2','') }}"
+    src: elasticsearch.yml.j2
+    dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/elasticsearch.yml"
     owner: elasticsearch
     group: elasticsearch
   notify: restart elasticsearch
-  loop: "{{ properties | dict2items }}"
-  vars:
-    properties:
-      configuration: elasticsearch.yml.j2
-      jvm_options: jvm.options.j2
   tags: configure
 
-- name: establish logging
-  when: log4j2 is defined
+- name: establish jvm configuration
+  when: elk_elasticsearch_jvm_options is defined
   template:
-    src: "{{ item }}"
-    dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/{{ item | basename | regex_replace('\\.j2','') }}"
+    src: "jvm.options.j2"
+    dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/jvm.options"
     owner: elasticsearch
     group: elasticsearch
   notify: restart elasticsearch
-  loop:
-    - log4j2.properties.j2
+  tags: configure
+
+- name: establish logging configuration
+  when: elk_elasticsearch_log4j2 is defined
+  template:
+    src: "log4j2.properties.j2"
+    dest: "{{ platform['elasticsearch']['configuration']['dir'] }}/log4j2.properties"
+    owner: elasticsearch
+    group: elasticsearch
+  notify: restart elasticsearch
   tags: configure

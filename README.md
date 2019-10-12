@@ -1,4 +1,4 @@
-Elasticsearch
+Ansible role: Elasticsearch
 =========
 
 Elasticsearch installation and configuration.
@@ -10,39 +10,22 @@ None
 
 Role Variables
 --------------
-These defaults are set in defaults/main.yml:
+These variables are defined in [defaults/main.yml](./defaults/main.yml):
 
-    version: 6
+    elk_version: 6
 
-    jvm_options:
-      heap_space: "1g"
-
-    configuration:
-      cluster:
-        name: "{{ inventory_hostname }}"
-        remote.connect: false
-      node:
-        name: "{{ inventory_hostname }}"
-        master: true
-        data: true
-        ingest: true
-      discovery.zen:
-        ping.unicast.hosts: "{{ ['127.0.0.1'] | to_json }}"
-        minimum_master_nodes: 1
-      path:
-        logs: "/var/log/elasticsearch"
-        data: "/var/lib/elasticsearch"
-      bootstrap.memory_lock: true
-      network.host: "127.0.0.1"
-      http.port: "9200"
-
-    service:
+    elk_elasticsearch_service:
       enabled: true
       state: started
 
-Non defaulted variables that can be set:
+Other variables that can be set:
 
-    log4j2: <string, entire file contents>
+    elk_elasticsearch_log4j2:               # string, the entire file contents
+
+    elk_elasticsearch_configuration:        # the entire Elasticsearch YAML configuration
+
+    elk_elasticsearch_jvm_options:
+      heap_space: "1g"
 
 Dependencies
 ------------
@@ -56,7 +39,7 @@ Example Playbook
       roles:
         - role: elasticsearch
           vars:
-            jvm_options:
+            elk_elasticsearch_jvm_options:
               heap_space: "2g"
 
 License
