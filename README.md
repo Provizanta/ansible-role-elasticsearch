@@ -1,6 +1,8 @@
 Ansible role: Elasticsearch
 =========
 
+![Build & Deploy](https://github.com/Provizanta/ansible-role-elasticsearch/workflows/molecule/badge.svg?branch=master)
+
 Elasticsearch installation and configuration.
 
 Requirements

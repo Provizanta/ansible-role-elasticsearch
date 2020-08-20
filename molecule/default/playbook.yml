@@ -8,7 +8,7 @@
       apt:
         update_cache: true
   roles:
-    - role: elasticsearch
+    - role: ansible-role-elasticsearch
       vars:
         elk_version: 6
         elk_elasticsearch_jvm_options:
