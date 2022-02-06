@@ -2,9 +2,10 @@
 
 galaxy_info:
   role_name: elasticsearch
+  namespace: provizanta
   author: Tibor Csóka
   description: |
-    "Establish elasticsearch in a specific version along with a specified configuration."
+    Establish elasticsearch in a specific version along with a specified configuration.
   company: ""
 
   license: MIT
